@@ -37,16 +37,24 @@ export const updateUser = async (req, res) => {
         let updatedPassword = null;
 
         try {
+            // Si existe el cambio de contraseña en el usario Hashea la contraseña que quiere actualizar antes de mandarse al a BD
             if (password) {
                 updatedPassword = await bcrypt.hash(password, 10);
             }
 
+            // manda todo el contenido de los inputs en este caso son "email y nombre", por que password y avatar, solo se mandaran en dado caso de haber sido modificados
             const updateUser = await prisma.user.update({
                 where: { id },
                 data: {
                     ...inputs,
                     ...(updatedPassword && { password: updatedPassword }),
                     ...(avatar && { avatar }),
+                },
+                // Excluye el campo de la contraseña para que no se mande en la respuesta del servidor
+                include: {
+                    select: {
+                        password: false,
+                    },
                 },
             });
 

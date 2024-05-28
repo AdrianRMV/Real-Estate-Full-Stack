@@ -14,7 +14,13 @@ function ProfileUpdatePage() {
         const { username, email, password } = Object.fromEntries(formData);
 
         try {
-            const res = apiRequest.put(`/users/${currentUser.id}`);
+            const res = await apiRequest.put(`/users/${currentUser.id}`, {
+                username,
+                email,
+                password,
+            });
+            console.log(res.data);
+            updateUser(res.data);
         } catch (error) {
             console.log(error);
             setError(error.response.data.message);
@@ -49,6 +55,7 @@ function ProfileUpdatePage() {
                         <input id="password" name="password" type="password" />
                     </div>
                     <button>Update</button>
+                    {error && <span>{error}</span>}
                 </form>
             </div>
             <div className="sideContainer">
