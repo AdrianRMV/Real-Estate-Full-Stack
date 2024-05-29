@@ -50,15 +50,11 @@ export const updateUser = async (req, res) => {
                     ...(updatedPassword && { password: updatedPassword }),
                     ...(avatar && { avatar }),
                 },
-                // Excluye el campo de la contraseña para que no se mande en la respuesta del servidor
-                include: {
-                    select: {
-                        password: false,
-                    },
-                },
             });
 
-            res.status(200).json(updateUser);
+            const { password: userPassword, ...rest } = updateUser;
+
+            res.status(200).json(rest);
         } catch (error) {}
     } catch (error) {
         console.log(error);
