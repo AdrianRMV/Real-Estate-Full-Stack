@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import './searchBar.scss';
 import { Link } from 'react-router-dom';
+
 const types = ['buy', 'rent'];
 
 function SearchBar() {
     const [query, setQuery] = useState({
         type: 'buy',
-        location: '',
+        city: '',
         minPrice: 0,
         maxPrice: 0,
     });
@@ -35,8 +36,8 @@ function SearchBar() {
             <form>
                 <input
                     type="text"
-                    name="location"
-                    placeholder="City Location"
+                    name="city"
+                    placeholder="City"
                     onChange={handleChange}
                 />
                 <input
