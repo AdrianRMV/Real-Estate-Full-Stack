@@ -1,7 +1,7 @@
 import './singlePage.scss';
 import Slider from '../../components/slider/Slider';
 import Map from '../../components/map/Map';
-import { redirect, useLoaderData } from 'react-router-dom';
+import { useNavigate, useLoaderData } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
@@ -10,23 +10,22 @@ import apiRequest from '../../lib/apiRequest';
 function SinglePage() {
     const post = useLoaderData();
     const [saved, setSaved] = useState(post.isSaved);
-
     const { currentUser } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const handleSave = async () => {
-        setSaved((prev) => !prev);
         if (!currentUser) {
-            redirect('/login');
+            navigate('/login');
         }
+        setSaved((prev) => !prev);
         try {
-            await apiRequest.post('/users/save', {
-                postId: post.id,
-            });
-        } catch (error) {
-            console.log(error);
+            await apiRequest.post('/users/save', { postId: post.id });
+        } catch (err) {
+            console.log(err);
             setSaved((prev) => !prev);
         }
     };
+
     return (
         <div className="singlePage">
             <div className="details">
@@ -43,14 +42,7 @@ function SinglePage() {
                                 <div className="price">$ {post.price}</div>
                             </div>
                             <div className="user">
-                                <img
-                                    src={
-                                        post.user.avatar !== null
-                                            ? post.user.avatar
-                                            : '/noavatar.jpg'
-                                    }
-                                    alt=""
-                                />
+                                <img src={post.user.avatar} alt="" />
                                 <span>{post.user.username}</span>
                             </div>
                         </div>
@@ -85,9 +77,9 @@ function SinglePage() {
                             <div className="featureText">
                                 <span>Pet Policy</span>
                                 {post.postDetail.pet === 'allowed' ? (
-                                    <p>Pet Allowed</p>
+                                    <p>Pets Allowed</p>
                                 ) : (
-                                    <p>Pet not Allowed</p>
+                                    <p>Pets not Allowed</p>
                                 )}
                             </div>
                         </div>
@@ -155,7 +147,7 @@ function SinglePage() {
                         <button
                             onClick={handleSave}
                             style={{
-                                background: saved ? '#fece51' : '#ffffff',
+                                backgroundColor: saved ? '#fece51' : 'white',
                             }}
                         >
                             <img src="/save.png" alt="" />
