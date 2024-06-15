@@ -26,6 +26,8 @@ function SinglePage() {
         }
     };
 
+    console.log(post.user);
+
     return (
         <div className="singlePage">
             <div className="details">
@@ -42,7 +44,10 @@ function SinglePage() {
                                 <div className="price">$ {post.price}</div>
                             </div>
                             <div className="user">
-                                <img src={post.user.avatar} alt="" />
+                                <img
+                                    src={post.user.avatar || 'noavatar.jpg'}
+                                    alt=""
+                                />
                                 <span>{post.user.username}</span>
                             </div>
                         </div>

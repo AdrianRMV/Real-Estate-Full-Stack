@@ -21,6 +21,7 @@ function ProfilePage() {
             console.log(error);
         }
     };
+
     return (
         <div className="profilePage">
             <div className="details">
