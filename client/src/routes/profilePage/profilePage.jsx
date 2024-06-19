@@ -8,6 +8,7 @@ import { AuthContext } from '../../context/AuthContext';
 
 function ProfilePage() {
     const data = useLoaderData();
+    console.log(data);
     const { updateUser, currentUser } = useContext(AuthContext);
 
     const navigate = useNavigate();
@@ -84,7 +85,7 @@ function ProfilePage() {
                     <Suspense fallback={<p>Loading...</p>}>
                         <Await
                             resolve={data.chatResponse}
-                            errorElement={<p>Error Loading chats!...</p>}
+                            errorElement={<p>Error loading chats!</p>}
                         >
                             {(chatResponse) => (
                                 <Chat chats={chatResponse.data} />
