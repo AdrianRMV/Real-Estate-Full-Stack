@@ -3,8 +3,8 @@ import cors from 'cors';
 import postRoute from './routes/post.route.js';
 import authRoute from './routes/auth.route.js';
 import userRoute from './routes/user.route.js';
-import chatRoute from './routes/user.route.js';
-import messageRoute from './routes/user.route.js';
+import chatRoute from './routes/chat.route.js';
+import messageRoute from './routes/message.route.js';
 
 import cookieParser from 'cookie-parser';
 
