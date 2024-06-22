@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import './chat.scss';
 import { AuthContext } from '../../context/AuthContext';
 import apiRequest from '../../lib/apiRequest';
@@ -11,6 +11,14 @@ function Chat({ chats }) {
     const { currentUser } = useContext(AuthContext);
     const { socket } = useContext(SocketContext);
 
+    const messageEndRef = useRef();
+
+    useEffect(() => {
+        messageEndRef.current?.scrollIntoView({
+            behavior: 'smooth',
+        });
+    }, [chat]);
+
     const handleOpenChat = async (id, receiver) => {
         try {
             const res = await apiRequest(`/chats/${id}`);
@@ -22,45 +30,79 @@ function Chat({ chats }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         const formData = new FormData(e.target);
         const text = formData.get('text');
 
         if (!text) return;
-
         try {
-            const res = await apiRequest.post(`/messages/${chat.id}`, { text });
+            const res = await apiRequest.post('/messages/' + chat.id, { text });
             setChat((prev) => ({
                 ...prev,
                 messages: [...prev.messages, res.data],
             }));
             e.target.reset();
-        } catch (error) {
-            console.log(error);
+            console.log(chat.receiver.id);
+            socket.emit('sendMessage', {
+                receiverId: chat.receiver.id,
+                data: res.data,
+            });
+        } catch (err) {
+            console.log(err);
         }
     };
+
+    useEffect(() => {
+        const read = async () => {
+            try {
+                await apiRequest.put('/chats/read/' + chat.id);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        // Si el chat y el socket tienen algun valor (no son null), quiere decir que existen y recibe la funcion del servidor, la cual regresa como propiedad la "data" del mensaje mandado
+        if (chat && socket) {
+            socket.on('getMessage', (data) => {
+                // Si el id del chat que se encuentra abierto es el mismo que del mensaje que recibio el usuario entonces procedera
+
+                if (chat.id === data.chatId) {
+                    setChat((prev) => ({
+                        ...prev,
+                        messages: [...prev.messages, data],
+                    }));
+                    read();
+                }
+            });
+        }
+        // return () => {
+        //     socket.off('getMessage');
+        // };
+    }, [socket, chat]);
+
     return (
         <div className="chat">
             <div className="messages">
                 <h1>Messages</h1>
-                {chats.map((chat) => (
+                {chats.map((c) => (
                     <div
                         className="message"
-                        key={chat.id}
+                        key={c.id}
                         style={{
-                            backgroundColor: chat.seenBy.includes(
-                                currentUser.id
-                            )
-                                ? 'white'
-                                : '#fecd514e',
+                            backgroundColor:
+                                c.seenBy.includes(currentUser.id) ||
+                                chat?.id === c.id
+                                    ? 'white'
+                                    : '#fecd514e',
                         }}
-                        onClick={() => handleOpenChat(chat.id, chat.receiver)}
+                        onClick={() => handleOpenChat(c.id, c.receiver)}
                     >
                         <img
-                            src={chat.receiver.avatar || '/noavatar.jpg'}
+                            src={c.receiver.avatar || '/noavatar.jpg'}
                             alt=""
                         />
-                        <span>{chat.receiver.username}</span>
-                        <p>{chat.lastMessage}</p>
+                        <span>{c.receiver.username}</span>
+                        <p>{c.lastMessage}</p>
                     </div>
                 ))}
             </div>
@@ -98,6 +140,7 @@ function Chat({ chats }) {
                                 <span>{format(message.createdAt)}</span>
                             </div>
                         ))}
+                        <div ref={messageEndRef}></div>
                     </div>
                     <form onSubmit={handleSubmit} className="bottom">
                         <textarea name="text"></textarea>
