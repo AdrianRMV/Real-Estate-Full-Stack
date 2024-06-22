@@ -22,7 +22,7 @@ const removeUser = (socketId) => {
 };
 
 const getUser = (userId) => {
-    return onlineUser.find((user) => user.id === userId);
+    return onlineUser.find((user) => user.userId === userId); // Cambiado 'id' a 'userId'
 };
 
 io.on('connection', (socket) => {
@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
 
     socket.on('sendMessage', ({ receiverId, data }) => {
         const receiver = getUser(receiverId);
-        io.to(receiver?.socketId).emit('getMessage', data);
+        io.to(receiver.socketId).emit('getMessage', data);
     });
 
     socket.on('disconnect', () => {

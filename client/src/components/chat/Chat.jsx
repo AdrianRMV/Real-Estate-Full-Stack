@@ -52,6 +52,14 @@ function Chat({ chats }) {
         }
     };
 
+    // Para que no sea necesario picarle el boton para mandar el mensaje
+    const enterFormMessage = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            e.target.form.requestSubmit(); // Enviar el formulario
+        }
+    };
+
     useEffect(() => {
         const read = async () => {
             try {
@@ -75,9 +83,9 @@ function Chat({ chats }) {
                 }
             });
         }
-        // return () => {
-        //     socket.off('getMessage');
-        // };
+        return () => {
+            socket.off('getMessage');
+        };
     }, [socket, chat]);
 
     return (
@@ -143,7 +151,11 @@ function Chat({ chats }) {
                         <div ref={messageEndRef}></div>
                     </div>
                     <form onSubmit={handleSubmit} className="bottom">
-                        <textarea name="text"></textarea>
+                        <textarea
+                            name="text"
+                            onKeyDown={enterFormMessage}
+                            style={{ resize: 'none' }}
+                        ></textarea>
                         <button>Send</button>
                     </form>
                 </div>
