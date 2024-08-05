@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiRequest = axios.create({
-    baseURL: 'http://localhost:8800/api',
+    baseURL: 'https://real-state-a91cdc78739e.herokuapp.com/api',
     withCredentials: true,
 });
 
